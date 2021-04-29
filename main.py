@@ -9,7 +9,6 @@ sys.path.insert(0, ROOT_DIR)
 
 # Linux system comes with psutil (on Ubuntu 20.04.1 LTS)
 if platform.system() == "Windows":	 from lib import psutil
-#if platform.system() == "Windows":	 import lib.psutil as psutil
 else:	import psutil
 
 #import lib.cpuinfo
@@ -26,7 +25,6 @@ logging.basicConfig(
 )
 
 #CPU_INFO_DICT = cpuinfo.get_cpu_info()
-
 #cpu_name = CPU_INFO_DICT["brand_raw"]
 #cpu_arch = CPU_INFO_DICT["arch"]
 username = os.environ.get('USERNAME')
@@ -41,7 +39,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-ct", "--core_type", help="physical(p) or logical(l), DEFAULT=logical",type=str, nargs=1, default="logical")
 parser.add_argument('-expnumc', '--expected_number_of_core', 
                     help=f"Expected number of cores. DEFAULT=Number of logical cores ({logical_core})", 
-                    type=int, 
+                    type=int,
                     default=logical_core)
 
 
