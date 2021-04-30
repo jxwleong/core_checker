@@ -11,8 +11,6 @@ ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, ROOT_DIR)
 
 
-
-
 with open("core_checker.log", "w") as f:    pass
 
 logging.basicConfig(
@@ -49,12 +47,12 @@ def get_processer_info():
     output = re.split(r"\s{2,14}?", output)
 
     for element in output:
-        if element != "":
+        if element != "" and element != " ":
             info_list.append(element)
         
     return info_list
 
-
+print(get_processer_info())
 parser = argparse.ArgumentParser()
 parser.add_argument("-ct", "--core_type", help="physical(p) or logical(l), DEFAULT=logical",type=str, nargs=1, default="logical")
 #parser.add_argument('-expnumc', '--expected_number_of_core', 
