@@ -35,6 +35,7 @@ cpu_info_list = [
     # logical_core_count 
 ]
 
+
 LSCPU_REGEX_DICT = {
     "LSCPU_CPU_REGEX": "\nCPU\(s\): \s*(\d*)",
     "LSCPU_SOCKET_REGEX": "Socket\(s\):\s*(\d*)",
@@ -59,18 +60,6 @@ WMIC_CPUINFO_LIST_INDEX = {
     "WMIC_NUMBER_OF_CORES": 2,    # Physical cores
     "WMIC_NUMBEROF_THREADS": 3    # Logical cores
 }
-
-def get_cpu_info():
-    """
-    Return a list with basic cpu information such as
-
-    Vendor ID, CPU Name, Number of Physical & Logical Cores
-    """
-    if os_type is "Windows":
-        return get_cpu_info_win()
-    else:
-        return get_cpu_info_linux()
-
 
 def get_cpu_info_windows():
     """
@@ -114,10 +103,21 @@ def get_cpu_info_linux():
     return info_list
 
 
+def get_cpu_info():
+    """
+    Return a list with basic cpu information such as
+
+    Vendor ID, CPU Name, Number of Physical & Logical Cores
+    """
+    if os_type == "win32":
+        return get_cpu_info_windows()
+    else:
+        return get_cpu_info_linux()
+
 def set_cpu_variable():
     _cpu_info_list = get_cpu_info()
 
-    if os_type is "Windows":
+    if os_type == "win32":
         for value in WMIC_CPUINFO_LIST_INDEX.values():
             cpu_info_list.append(_cpu_info_list[value])
     else:
@@ -131,6 +131,7 @@ parser.add_argument("-ct", "--core_type", help="physical(p) or logical(l), DEFAU
 #                    help=f"Expected number of cores. DEFAULT=Number of logical cores ({logical_core})", 
 #                    type=int,
 #                    default=logical_core)
+
 
 get_cpu_info()
 set_cpu_variable()
@@ -148,5 +149,5 @@ logging.info(f"USER: {username}")
 logging.info(f"Python version: {python_version}")
 logging.info(f"OS type: {os_type}")
 logging.info(f"OS version: {os_version}")
-
+logging.info("====================================")
 
