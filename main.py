@@ -23,9 +23,10 @@ logging.basicConfig(
 )
 
 
+hostname = platform.node()
 username = os.environ.get('USERNAME')
 python_version = sys.version
-os_type = sys.platform
+os_type = platform.system()
 os_version = platform.platform()
 
 cpu_info_list = [
@@ -109,15 +110,18 @@ def get_cpu_info():
 
     Vendor ID, CPU Name, Number of Physical & Logical Cores
     """
-    if os_type == "win32":
+    if os_type == "Windows":
         return get_cpu_info_windows()
     else:
         return get_cpu_info_linux()
 
-def set_cpu_variable():
+def set_cpu_info_list():
+    """
+    Set the cpu_info_list after calling get_cpu_info()
+    """
     _cpu_info_list = get_cpu_info()
 
-    if os_type == "win32":
+    if os_type == "Windows":
         for value in WMIC_CPUINFO_LIST_INDEX.values():
             cpu_info_list.append(_cpu_info_list[value])
     else:
@@ -134,7 +138,7 @@ parser.add_argument("-ct", "--core_type", help="physical(p) or logical(l), DEFAU
 
 
 get_cpu_info()
-set_cpu_variable()
+set_cpu_info_list()
 args = parser.parse_args()
 
 logging.info("====================================")
@@ -146,6 +150,7 @@ logging.info(f"Number of Physical Cores: {cpu_info_list[2]}")
 logging.info(f"Number of Logical Cores: {cpu_info_list[3]}")
 logging.info("")
 logging.info(f"USER: {username}")
+logging.info(f"HOSTNAME: {hostname}")
 logging.info(f"Python version: {python_version}")
 logging.info(f"OS type: {os_type}")
 logging.info(f"OS version: {os_version}")
