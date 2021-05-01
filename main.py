@@ -130,31 +130,124 @@ def set_cpu_info_list():
         for value in LSCPU_CPUINFO_LIST_INDEX.values():
             cpu_info_list.append(_cpu_info_list[value])
 
+def show_system_info():
+    """"
+    Log the system info to stdout and a file.
+    """
+    logging.info("====================================")
+    logging.info("         SYSTEM INFORMATION         ")
+    logging.info("====================================")
+    logging.info(f"CPU VENDOR: {cpu_info_list[0]}")
+    logging.info(f"CPU NAME: {cpu_info_list[1]}")
+    logging.info(f"Number of Physical Cores: {cpu_info_list[2]}")
+    logging.info(f"Number of Logical Cores: {cpu_info_list[3]}")
+    logging.info("")
+    logging.info(f"USER: {username}")
+    logging.info(f"HOSTNAME: {hostname}")
+    logging.info(f"Python version: {python_version}")
+    logging.info(f"OS type: {os_type}")
+    logging.info(f"OS version: {os_version}")
+    logging.info("====================================")
 
-parser = argparse.ArgumentParser()
-parser.add_argument("-ct", "--core_type", help="physical(p) or logical(l), DEFAULT=logical",type=str, nargs=1, default="logical")
-#parser.add_argument('-expnumc', '--expected_number_of_core', 
-#                    help=f"Expected number of cores. DEFAULT=Number of logical cores ({logical_core})", 
-#                    type=int,
-#                    default=logical_core)
+def arg_init():
+    """
+    Initialize argparse with default variables.
+
+    Retval:
+    Namespace of initialized arguments
+    
+    NOTE:
+    Expect these functions to be called before invoke this function
+    1.  get_cpu_info()
+    2.  set_cpu_info_list()
+    """
+    logical_core_count =  cpu_info_list[3]
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-epc', '--expected_physical_cores', 
+                       help=f"Expected number of physical cores.", 
+                       type=int)
+    parser.add_argument('-elc', '--expected_logical_cores', 
+                    help=f"Expected number of logical cores.", 
+                    type=int)                   
+    args = parser.parse_args()
+    return args
 
 
-get_cpu_info()
-set_cpu_info_list()
-args = parser.parse_args()
+def argument_not_specified(args_dict):
+    """
+    Return True if all the values in args_dict is None,
+    else return False
 
-logging.info("====================================")
-logging.info("         SYSTEM INFORMATION         ")
-logging.info("====================================")
-logging.info(f"CPU VENDOR: {cpu_info_list[0]}")
-logging.info(f"CPU NAME: {cpu_info_list[1]}")
-logging.info(f"Number of Physical Cores: {cpu_info_list[2]}")
-logging.info(f"Number of Logical Cores: {cpu_info_list[3]}")
-logging.info("")
-logging.info(f"USER: {username}")
-logging.info(f"HOSTNAME: {hostname}")
-logging.info(f"Python version: {python_version}")
-logging.info(f"OS type: {os_type}")
-logging.info(f"OS version: {os_version}")
-logging.info("====================================")
+    Args:
+    args_dict: argparse namespace object in dict    
+    """
+    if all(value is None for value in args_dict.values()):
+        return True
+    return False
+
+
+def core_checker(core_type, expected_value):
+    """
+    Check the number of physical/logical cores.
+    Must call these functions first
+    1.  get_cpu_info()
+    2.  set_cpu_info_list()
+
+    Args:
+        core_type (str): Either is or contain "logical", "physical", case insensitive
+        expected_value (int): Expected number of cores for core_type
+    """
+    core_type = core_type.lower()
+
+    if "logical" in core_type:
+        if int(cpu_info_list[3]) != expected_value:
+            logging.error(f"Expected Logical Core Count: {expected_value}, Actual: {cpu_info_list[3]}")
+            logging.error(f"Exiting with exit code 1")
+            exit(1)
+        logging.info(f"Actual Logical Core Count is same as expected ({expected_value})")
+        return True
+    elif "physical" in core_type:
+        if int(cpu_info_list[2]) != expected_value:
+            logging.error(f"Expected Physical Core Count: {expected_value}, Actual: {cpu_info_list[3]}")
+            logging.error(f"Exiting with exit code 1")
+            exit(1)
+        logging.info(f"Actual Physical Core Count is same as expected ({expected_value})")    
+        return True
+    else:
+        raise ValueError(f"Invalid option received (core_type) for 'core_type'")
+
+
+
+def process_arg(args):
+    """
+    Process the arguments(args) after calling arg_init()
+    """
+    args_dict = args.__dict__
+
+    if argument_not_specified(args_dict):
+        logging.warning("No arguments specified, assuming no checking is needed.")
+        logging.warning("Exit with exit code 0")
+        exit(0)
+    else:
+        for key, value in args_dict.items():
+            if value is not None:
+                core_checker(key, value)
+        # core_checker will exit(1) if either/both of the physical and logical cores
+        # does not matched the expected value specified in argument.
+        # If it can make it through here, then the number of physical/logical cores 
+        # are same as expected.
+        logging.warning("Exit with exit code 0")
+        exit(0)
+
+        
+if __name__ == "__main__":
+    get_cpu_info()
+    set_cpu_info_list()
+    show_system_info()
+
+    args = arg_init()
+    process_arg(args)
+
+
 
