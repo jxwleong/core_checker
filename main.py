@@ -76,6 +76,7 @@ def get_cpu_info_windows():
     """
     info_list = []
     output = subprocess.check_output("wmic cpu get Manufacturer,Name,ThreadCount, NumberOfCores").decode()
+    with open("wmic_cpu_stdout.log", "w") as f: f.write(output.replace("\r\r", ""))
     output = output.replace("\r\r", "").split("\n")[1] # Remove the \r\r then extract the second line only
     output = re.split(r"\s{2,14}?", output)
 
@@ -99,6 +100,7 @@ def get_cpu_info_linux():
     """
     info_list = []
     output = subprocess.check_output("lscpu").decode()
+    with open("lscpu_stdout.log", "w") as f: f.write(output)
     for regex in LSCPU_REGEX_DICT.values():
         info_list.append(re.findall(regex, output)[0])
     return info_list
