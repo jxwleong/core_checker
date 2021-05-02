@@ -35,7 +35,10 @@ cpu_info_list = [
     # physical_core_count
     # logical_core_count 
 ]
-
+CPU_VENDOR_ID = 0
+CPU_MODEL_NAME = 1
+CPU_PHYSICAL_CORES = 2
+CPU_LOGICAL_CORES = 3
 
 LSCPU_REGEX_DICT = {
     "LSCPU_CPU_REGEX": "\nCPU\(s\): \s*(\d*)",
@@ -161,7 +164,6 @@ def arg_init():
     1.  get_cpu_info()
     2.  set_cpu_info_list()
     """
-    logical_core_count =  cpu_info_list[3]
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-epc', '--expected_physical_cores', 
@@ -201,18 +203,18 @@ def core_checker(core_type, expected_value):
     core_type = core_type.lower()
 
     if "logical" in core_type:
-        if int(cpu_info_list[3]) != expected_value:
-            logging.error(f"Expected Logical Core Count: {expected_value}, Actual: {cpu_info_list[3]}")
+        if int(cpu_info_list[CPU_LOGICAL_CORES]) != expected_value:
+            logging.error(f"Expected Logical Cores: {expected_value}, Actual: {cpu_info_list[CPU_LOGICAL_CORES]}")
             logging.error(f"Exiting with exit code 1")
             exit(1)
-        logging.info(f"Actual Logical Core Count is same as expected ({expected_value})")
+        logging.info(f"Actual Logical Cores is same as expected ({expected_value})")
         return True
     elif "physical" in core_type:
-        if int(cpu_info_list[2]) != expected_value:
-            logging.error(f"Expected Physical Core Count: {expected_value}, Actual: {cpu_info_list[3]}")
+        if int(cpu_info_list[CPU_PHYSICAL_CORES]) != expected_value:
+            logging.error(f"Expected Physical Cores: {expected_value}, Actual: {cpu_info_list[CPU_PHYSICAL_CORES]}")
             logging.error(f"Exiting with exit code 1")
             exit(1)
-        logging.info(f"Actual Physical Core Count is same as expected ({expected_value})")    
+        logging.info(f"Actual Physical Cores is same as expected ({expected_value})")    
         return True
     else:
         raise ValueError(f"Invalid option received (core_type) for 'core_type'")
