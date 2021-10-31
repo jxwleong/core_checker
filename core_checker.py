@@ -10,7 +10,15 @@ import logging
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, ROOT_DIR)
 
+"""
+For Ubuntu, 
+somehow the log files generated will have lock icon.
+Observed this after adding alias to ~/.bashrc
 
+To solve this,
+sudo chown -R $USER: $HOME
+from https://askubuntu.com/a/263454
+"""
 with open("core_checker.log", "w") as f:    pass
 
 logging.basicConfig(
