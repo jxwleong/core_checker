@@ -19,13 +19,11 @@ To solve this,
 sudo chown -R $USER: $HOME
 from https://askubuntu.com/a/263454
 """
-with open("core_checker.log", "w") as f:    pass
-
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
-        logging.FileHandler("core_checker.log"),
+        logging.FileHandler(filename="core_checker.log", mode="w"),
         logging.StreamHandler()
     ]
 )
